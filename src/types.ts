@@ -1,0 +1,48 @@
+export interface AssetSummary {
+  asset_id: string;
+  timestamp: string;
+  failure_probability: number;
+  confidence: number;
+  risk_level: 'low' | 'medium' | 'high' | 'unknown';
+  prediction_id: number;
+}
+
+export interface JudgeOutput {
+  failure_probability: number;
+  confidence: number;
+  rationale: string;
+}
+
+export interface AssetDetail {
+  id: number;
+  asset_id: string;
+  timestamp: string;
+  actual_outcome: number | null;
+  view1_text: string | null;
+  view2_text: string | null;
+  view3_text: string | null;
+  view4_text: string | null;
+  judge_output: JudgeOutput | null;
+  created_at: string;
+}
+
+export interface CalibrationBin {
+  bin_label: string;
+  bin_mid: number;
+  actual_rate: number;
+  count: number;
+}
+
+export interface CalibrationPoint {
+  predicted_probability: number;
+  actual_outcome: number;
+  confidence: number;
+  squared_error: number;
+}
+
+export interface CalibrationData {
+  brier_score: number;
+  total_predictions: number;
+  calibration_curve: CalibrationBin[];
+  points: CalibrationPoint[];
+}
