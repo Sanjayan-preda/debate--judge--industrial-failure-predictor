@@ -6,7 +6,7 @@ and return a natural-language argument for or against imminent failure.
 from typing import Optional
 
 from .api import ApiCallResult, call_chat_completion
-from .config import Config
+from .config import Config, FIREWORKS_BASE_URL
 
 
 def _features_text(row: dict) -> str:
@@ -58,9 +58,9 @@ def call_signal_analyst(
     user_prompt = f"Here are the sensor readings:\n\n{_features_text(row)}\n\nAnalyse these readings and give your conclusion."
 
     return call_chat_completion(
-        endpoint_url=cfg.amd_endpoint_url,
-        api_key=cfg.amd_api_key,
-        model=cfg.amd_model,
+        endpoint_url=FIREWORKS_BASE_URL,
+        api_key=cfg.fireworks_api_key,
+        model=cfg.fireworks_view_model,
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
@@ -96,7 +96,7 @@ def call_domain_expert(
     user_prompt = f"Here are the sensor readings:\n\n{_features_text(row)}\n\nWhat does your mechanical expertise say about this equipment?"
 
     return call_chat_completion(
-        endpoint_url="https://api.fireworks.ai/inference/v1",
+        endpoint_url=FIREWORKS_BASE_URL,
         api_key=cfg.fireworks_api_key,
         model=cfg.fireworks_view_model,
         messages=[
@@ -133,7 +133,7 @@ def call_risk_assessor(
     user_prompt = f"Here are the sensor readings:\n\n{_features_text(row)}\n\nAssess the risk level and urgency."
 
     return call_chat_completion(
-        endpoint_url="https://api.fireworks.ai/inference/v1",
+        endpoint_url=FIREWORKS_BASE_URL,
         api_key=cfg.fireworks_api_key,
         model=cfg.fireworks_view_model,
         messages=[
@@ -175,9 +175,9 @@ def call_skeptic(
     )
 
     return call_chat_completion(
-        endpoint_url=cfg.amd_endpoint_url,
-        api_key=cfg.amd_api_key,
-        model=cfg.amd_model,
+        endpoint_url=FIREWORKS_BASE_URL,
+        api_key=cfg.fireworks_api_key,
+        model=cfg.fireworks_view_model,
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},

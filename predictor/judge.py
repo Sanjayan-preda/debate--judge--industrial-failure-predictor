@@ -8,7 +8,7 @@ import re
 from typing import Optional
 
 from .api import ApiCallResult, call_chat_completion
-from .config import Config
+from .config import Config, FIREWORKS_BASE_URL
 
 
 def _extract_json(text: str) -> Optional[dict]:
@@ -94,7 +94,7 @@ def call_judge(
     )
 
     result = call_chat_completion(
-        endpoint_url="https://api.fireworks.ai/inference/v1",
+        endpoint_url=FIREWORKS_BASE_URL,
         api_key=cfg.fireworks_api_key,
         model=cfg.fireworks_judge_model,
         messages=[
@@ -122,7 +122,7 @@ def call_judge(
             f"Here are the analyses again:\n\n{user_prompt}"
         )
         retry_result = call_chat_completion(
-            endpoint_url="https://api.fireworks.ai/inference/v1",
+            endpoint_url=FIREWORKS_BASE_URL,
             api_key=cfg.fireworks_api_key,
             model=cfg.fireworks_judge_model,
             messages=[{"role": "user", "content": retry_prompt}],

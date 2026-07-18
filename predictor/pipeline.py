@@ -1,8 +1,10 @@
 """
-Core pipeline: load features, run debate + judge, save results.
+Core pipeline: load features, anomaly gate, debate + judge, save results.
 """
 
 import csv
+import json
+import math
 import sys
 import time
 from typing import Iterator
@@ -16,6 +18,57 @@ from .views import (
     call_skeptic,
 )
 from .judge import call_judge
+
+
+# ── Anomaly Gate ──────────────────────────────────────────────────────
+
+
+def anomaly_gate(row: dict) -> tuple[bool, str]:
+    """
+    Rule-based anomaly gate that decides whether a reading warrants
+    escalation to the full multi-agent debate.
+
+    Returns (escalate: bool, reason: str).
+
+    Thresholds are based on typical vibration analysis for rotating machinery:
+      - RMS >= 4.0  → elevated vibration (suspect)
+      - Kurtosis >= 4.0 → high peakedness (bearing defect indicator)
+      - Spectral high-band energy > 0.6 → developing high-frequency fault
+    """
+    try:
+        rms = float(row.get("rms", 0))
+    except (ValueError, TypeError):
+        rms = 0.0
+
+    try:
+        kurtosis = float(row.get("kurtosis", 0))
+    except (ValueError, TypeError):
+        kurtosis = 0.0
+
+    spectral_raw = row.get("spectral_features", "[]")
+    try:
+        spectral = json.loads(spectral_raw) if isinstance(spectral_raw, str) else spectral_raw
+        if isinstance(spectral, list) and len(spectral) > 0:
+            # Look at the high-frequency end (last quarter of bands)
+            n = len(spectral)
+            high_band = spectral[n // 2:]
+            avg_high = sum(high_band) / len(high_band) if high_band else 0.0
+        else:
+            avg_high = 0.0
+    except (ValueError, TypeError, json.JSONDecodeError):
+        avg_high = 0.0
+
+    reasons = []
+    if rms >= 4.0:
+        reasons.append(f"RMS elevated ({rms:.2f} >= 4.0)")
+    if kurtosis >= 4.0:
+        reasons.append(f"Kurtosis high ({kurtosis:.2f} >= 4.0)")
+    if avg_high >= 0.6:
+        reasons.append(f"High-frequency energy elevated ({avg_high:.3f} >= 0.6)")
+
+    if reasons:
+        return (True, "; ".join(reasons))
+    return (False, "All readings within normal operating range")
 
 
 def load_features(path: str) -> list[dict]:
@@ -53,19 +106,18 @@ def run_debate(row: dict, cfg: Config) -> tuple[str, str, str, str]:
     """
     Run all four view calls for a single feature row.
     Returns (view1_text, view2_text, view3_text, view4_text).
-    Because the calls are independent, we make them sequentially here
-    (simple, debuggable). A future optimisation could parallelise them.
+    All calls use Fireworks AI.
     """
-    # ── Signal Analyst (AMD) ──────────────────────────────────────────
+    # ── Signal Analyst ──────────────────────────────────────────────
     v1 = call_signal_analyst(row, cfg)
 
-    # ── Domain Expert (Fireworks) ─────────────────────────────────────
+    # ── Domain Expert ───────────────────────────────────────────────
     v2 = call_domain_expert(row, cfg)
 
-    # ── Risk Assessor (Fireworks) ─────────────────────────────────────
+    # ── Risk Assessor ───────────────────────────────────────────────
     v3 = call_risk_assessor(row, cfg)
 
-    # ── Skeptic (AMD) ────────────────────────────────────────────────
+    # ── Skeptic ─────────────────────────────────────────────────────
     v4 = call_skeptic(row, cfg)
 
     return v1.text, v2.text, v3.text, v4.text
@@ -79,7 +131,10 @@ def process_one_row(
     conn,
 ) -> dict:
     """
-    Process a single feature row through the full debate + judge pipeline.
+    Process a single feature row through the full pipeline:
+      1. Anomaly gate (quick rule-based check)
+      2. If gate triggers → multi-agent debate + judge
+      3. Store result
     Returns a summary dict for logging.
     """
     asset_id = row.get("asset_id", "unknown")
@@ -88,6 +143,44 @@ def process_one_row(
     print(f"\n{'='*60}")
     print(f"[ROW {idx}/{total}] asset_id={asset_id}  timestamp={timestamp}")
     print(f"{'='*60}")
+
+    # ── Step 0: Anomaly Gate ─────────────────────────────────────────
+    escalate, gate_reason = anomaly_gate(row)
+    if not escalate:
+        print(f"\n── Anomaly Gate: SKIPPED ({gate_reason}) ──")
+        # Store a minimal "all clear" result without calling the AI
+        judge_output = {
+            "failure_probability": 0.05,
+            "confidence": 0.95,
+            "rationale": f"Anomaly gate cleared: {gate_reason}. "
+                         f"No escalation needed — equipment appears healthy.",
+            "disagreement_flag": False,
+        }
+        row_id = save_prediction(
+            conn,
+            asset_id=asset_id,
+            timestamp=timestamp,
+            view1_text=None,
+            view2_text=None,
+            view3_text=None,
+            view4_text=None,
+            judge_output=judge_output,
+        )
+        print(f"\n── Result ──")
+        print(f"  DB row ID:    {row_id}")
+        print(f"  Probability:  0.05 (gate bypass)")
+        print(f"  Confidence:   0.95")
+        return {
+            "asset_id": asset_id,
+            "timestamp": timestamp,
+            "failure_probability": 0.05,
+            "confidence": 0.95,
+            "disagreement_flag": False,
+            "row_id": row_id,
+            "gate_skipped": True,
+        }
+
+    print(f"\n── Anomaly Gate: ESCALATED ({gate_reason}) ──")
 
     # ── Step 1: Debate — run all four views ──────────────────────────
     print("\n── View calls ──")

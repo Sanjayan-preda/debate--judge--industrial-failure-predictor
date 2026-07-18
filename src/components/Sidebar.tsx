@@ -1,9 +1,9 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Activity, BarChart3 } from 'lucide-react';
+import { Wind, BarChart3, Zap } from 'lucide-react';
 
 const links = [
-  { to: '/', label: 'Overview', icon: LayoutDashboard },
-  { to: '/calibration', label: 'Calibration', icon: BarChart3 },
+  { to: '/', label: 'Asset Overview', icon: Wind },
+  { to: '/calibration', label: 'Calibration & Trust', icon: BarChart3 },
 ];
 
 export default function Sidebar() {
@@ -11,9 +11,9 @@ export default function Sidebar() {
     <aside className="w-60 border-r border-border bg-surface shrink-0 flex flex-col h-full" role="navigation" aria-label="Main navigation">
       {/* Brand */}
       <div className="flex items-center gap-2.5 px-5 h-16 border-b border-border shrink-0">
-        <Activity className="w-5 h-5 text-teal" aria-hidden="true" />
+        <Zap className="w-5 h-5 text-teal" aria-hidden="true" />
         <span className="font-heading font-semibold text-sm text-text-primary tracking-tight">
-          Risk Monitor
+          GreenGrid Predict
         </span>
       </div>
 
@@ -45,8 +45,11 @@ export default function Sidebar() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal opacity-35" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-teal" />
           </span>
-          <span className="text-[11px] text-text-muted font-mono">System active</span>
+          <span className="text-[11px] text-text-muted font-mono">AI Engine Active</span>
         </div>
+        <p className="text-[9px] text-text-muted/50 mt-1 leading-tight">
+          Multi-agent debate · Fireworks AI
+        </p>
       </div>
     </aside>
   );

@@ -8,23 +8,20 @@ import sys
 from pathlib import Path
 
 # ── Defaults ──────────────────────────────────────────────────────────
-_DEFAULT_AMD_MODEL = "llama-2-7b-chat"
 _DEFAULT_FIREWORKS_VIEW_MODEL = "accounts/fireworks/models/llama-v3p1-8b-instruct"
 _DEFAULT_FIREWORKS_JUDGE_MODEL = "accounts/fireworks/models/llama-v3p1-70b-instruct"
 _DEFAULT_CSV_PATH = "data/features.csv"
 _DEFAULT_DB_PATH = "data/predictions.db"
+
+# Fireworks AI base URL
+FIREWORKS_BASE_URL = "https://api.fireworks.ai/inference/v1"
 
 
 class Config:
     """Immutable configuration loaded from environment variables at startup."""
 
     def __init__(self):
-        # ── AMD endpoint ──────────────────────────────────────────────
-        self.amd_endpoint_url = os.environ.get("AMD_ENDPOINT_URL", "").rstrip("/")
-        self.amd_api_key = os.environ.get("AMD_API_KEY", "no-key-required")
-        self.amd_model = os.environ.get("AMD_MODEL_NAME", _DEFAULT_AMD_MODEL)
-
-        # ── Fireworks AI ──────────────────────────────────────────────
+        # ── Fireworks AI (only AI backend) ──────────────────────────
         self.fireworks_api_key = os.environ.get("FIREWORKS_API_KEY", "")
         self.fireworks_view_model = os.environ.get(
             "FIREWORKS_VIEW_MODEL", _DEFAULT_FIREWORKS_VIEW_MODEL
@@ -50,8 +47,6 @@ class Config:
 
     def _validate(self) -> None:
         missing = []
-        if not self.amd_endpoint_url:
-            missing.append("AMD_ENDPOINT_URL")
         if not self.fireworks_api_key:
             missing.append("FIREWORKS_API_KEY")
         if missing:
@@ -68,8 +63,6 @@ class Config:
     def __repr__(self) -> str:
         return (
             f"Config(\n"
-            f"  AMD endpoint: {self.amd_endpoint_url}\n"
-            f"  AMD model:    {self.amd_model}\n"
             f"  FW view model: {self.fireworks_view_model}\n"
             f"  FW judge model: {self.fireworks_judge_model}\n"
             f"  CSV path:     {self.features_csv_path}\n"
