@@ -4,8 +4,9 @@ import Sidebar from './components/Sidebar';
 import AssetList from './components/AssetList';
 import AssetDetail from './components/AssetDetail';
 import Calibration from './components/Calibration';
+import Landing from './components/Landing';
 
-/* ── Layout ────────────────────────────────────────────────────────── */
+/* ── Layout (dashboard shell) ────────────────────────────────────────── */
 
 function Layout() {
   const navigation = useNavigation();
@@ -44,10 +45,14 @@ async function calibrationLoader() {
 
 const router = createBrowserRouter([
   {
+    path: '/',
+    element: <Landing />,
+  },
+  {
     element: <Layout />,
     children: [
       {
-        path: '/',
+        path: '/dashboard',
         element: <AssetList />,
         loader: assetsLoader,
       },

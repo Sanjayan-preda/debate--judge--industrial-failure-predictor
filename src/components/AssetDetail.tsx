@@ -49,7 +49,7 @@ export default function AssetDetail() {
     <div className="max-w-4xl space-y-6 animate-fade-in">
       {/* Back link */}
       <Link
-        to="/"
+        to="/dashboard"
         className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-text-primary transition-colors"
       >
         <ArrowLeft className="w-4 h-4" aria-hidden="true" />

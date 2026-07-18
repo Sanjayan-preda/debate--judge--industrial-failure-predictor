@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { Wind, BarChart3, Zap } from 'lucide-react';
 
 const links = [
-  { to: '/', label: 'Asset Overview', icon: Wind },
+  { to: '/dashboard', label: 'Asset Overview', icon: Wind },
   { to: '/calibration', label: 'Calibration & Trust', icon: BarChart3 },
 ];
 
