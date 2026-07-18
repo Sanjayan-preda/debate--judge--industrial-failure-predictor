@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Activity, Cloud, Cpu, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Activity, Zap, Radio, ShieldCheck } from 'lucide-react';
 
 /* ── Animated gauge (hero visual centerpiece) ────────────────────────── */
 
@@ -12,7 +12,6 @@ function HeroGauge() {
     const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
     ref.current = mql.matches;
     if (!mql.matches) {
-      // Sweep from 0 to ~65% after mount
       const t = setTimeout(() => setAngle(-90 + 0.65 * 180), 400);
       return () => clearTimeout(t);
     } else {
@@ -49,7 +48,7 @@ function HeroGauge() {
       viewBox="0 0 160 160"
       className="shrink-0"
       role="img"
-      aria-label="Confidence gauge showing a moderate failure probability"
+      aria-label="Risk gauge showing moderate disruption likelihood"
     >
       {/* Background arc */}
       <path d={arcPath(-90, 90, 0)} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={strokeW} strokeLinecap="round" />
@@ -117,7 +116,7 @@ export default function Landing() {
       <header className="relative z-10 flex items-center justify-between px-6 lg:px-12 h-16 border-b border-border shrink-0">
         <div className="flex items-center gap-2.5">
           <Activity className="w-5 h-5 text-teal" aria-hidden="true" />
-          <span className="font-heading font-semibold text-sm text-text-primary tracking-tight">GreenGrid Predict</span>
+          <span className="font-heading font-semibold text-sm text-text-primary tracking-tight">Energy Monitoring System</span>
         </div>
         <Link
           to="/dashboard"
@@ -131,13 +130,11 @@ export default function Landing() {
       <section className="relative z-10 flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-16 px-6 lg:px-12 py-16 lg:py-24 max-w-5xl mx-auto w-full">
         <div className="flex-1 min-w-0 space-y-5 text-center lg:text-left">
           <h1 className="font-heading text-3xl lg:text-4xl xl:text-5xl font-bold text-text-primary leading-tight tracking-tight">
-            Catch equipment failure before it happens —<br />
-            <span className="text-teal">before it costs you.</span>
+            Catch grid disruptions before they happen —<br />
+            <span className="text-teal">before they cost you.</span>
           </h1>
           <p className="text-sm lg:text-base text-text-secondary leading-relaxed max-w-lg mx-auto lg:mx-0">
-            Four analysts examine every signal from your renewable-energy assets. A
-            lead judge weighs their arguments, agrees or disagrees, and gives you
-            an honest confidence score — not just another alarm.
+            Our system examines every vibration and electrical signal from your energy grid assets — transformers, breakers, and power lines. A senior evaluator weighs multiple independent assessments to give you a clear, honest risk score — not just another alarm.
           </p>
           <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
             <Link
@@ -155,7 +152,7 @@ export default function Landing() {
         <div className="shrink-0 flex flex-col items-center gap-2 p-8 rounded-2xl bg-surface border border-border">
           <HeroGauge />
           <p className="text-[11px] text-text-muted font-mono text-center leading-relaxed">
-            Turbine WT-003 &middot; moderate risk<br />
+            Grid asset TR-205 &middot; moderate risk<br />
             confidence 82%
           </p>
         </div>
@@ -165,32 +162,32 @@ export default function Landing() {
       <section className="relative z-10 px-6 lg:px-12 py-16 lg:py-20 max-w-4xl mx-auto w-full">
         <div className="text-center mb-10">
           <h2 className="font-heading text-xl lg:text-2xl font-bold text-text-primary tracking-tight">How it works</h2>
-          <p className="text-sm text-text-muted mt-2">From raw signal to a clear decision — in four steps.</p>
+          <p className="text-sm text-text-muted mt-2">From raw sensor data to a clear decision — in four steps.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StepCard
-            icon={<Cloud className="w-5 h-5 text-teal" aria-hidden="true" />}
-            title="1. Listen"
-            description="Vibration, temperature, and power data stream in from every sensor across your wind, solar, and hydro assets."
+            icon={<Zap className="w-5 h-5 text-teal" aria-hidden="true" />}
+            title="1. Monitor"
+            description="Sensors on every grid asset — transformers, breakers, and power lines — stream vibration and electrical data in real time."
             index={0}
           />
           <StepCard
-            icon={<Cpu className="w-5 h-5 text-teal" aria-hidden="true" />}
+            icon={<Radio className="w-5 h-5 text-teal" aria-hidden="true" />}
             title="2. Analyse"
-            description="Four independent analysts each inspect the same data from a different angle — patterns, history, risk, and doubt."
+            description="A health check computes key metrics — signal strength, noise patterns, and frequency bands — to spot early signs of trouble."
             index={1}
           />
           <StepCard
             icon={<ShieldCheck className="w-5 h-5 text-teal" aria-hidden="true" />}
-            title="3. Judge"
-            description="A lead judge reads every analysis, reconciles disagreements, and produces a single score — with confidence attached."
+            title="3. Evaluate"
+            description="Four independent assessors examine the data from different angles, then a senior evaluator produces a single, clear risk score."
             index={2}
           />
           <StepCard
             icon={<Activity className="w-5 h-5 text-teal" aria-hidden="true" />}
             title="4. Decide"
-            description="You see the score, the reasoning, and the disagreement behind it. Confirm maintenance, snooze, or dismiss with context."
+            description="You see the risk level, sensor metrics, and reasoning. Confirm maintenance, snooze, or dismiss with full context."
             index={3}
           />
         </div>
@@ -201,14 +198,14 @@ export default function Landing() {
         <div className="text-center max-w-2xl mx-auto space-y-4">
           <h2 className="font-heading text-xl lg:text-2xl font-bold text-text-primary tracking-tight">Why this matters</h2>
           <p className="text-sm text-text-secondary leading-relaxed">
-            Every hour of unplanned downtime in renewable energy costs money and wastes clean power. Most predictive
+            Every hour of unplanned grid downtime costs money and risks supply reliability. Most predictive
             maintenance tools just scream louder — more alerts, more noise, more false alarms that get ignored.
           </p>
           <p className="text-sm text-text-secondary leading-relaxed">
-            <strong className="text-text-primary">GreenGrid Predict</strong> is built differently. By modelling disagreement
-            between multiple independent analyses, it surfaces <em>only</em> what deserves attention — and tells you
+            <strong className="text-text-primary">Energy Monitoring System</strong> is built differently. By cross-referencing
+            multiple independent assessments, it surfaces <em>only</em> what deserves attention — and tells you
             honestly how sure it is. That means less wasted inspection time, fewer unnecessary shutdowns, and
-            equipment that stays online longer.
+            a more reliable energy grid.
           </p>
         </div>
       </section>
@@ -230,7 +227,7 @@ export default function Landing() {
       {/* ── Footer ───────────────────────────────────────────────────── */}
       <footer className="relative z-10 mt-auto px-6 lg:px-12 py-5 border-t border-border">
         <p className="text-[10px] text-text-muted/50 text-center">
-          GreenGrid Predict &middot; Multi-agent debate engine powered by Fireworks AI
+          Energy Monitoring System &middot; Multi-assessor engine powered by AI
         </p>
       </footer>
 

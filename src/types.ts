@@ -5,12 +5,16 @@ export interface AssetSummary {
   confidence: number;
   risk_level: 'low' | 'medium' | 'high' | 'unknown';
   prediction_id: number;
+  rms?: number;
+  kurtosis?: number;
+  disagreement_flag?: boolean;
 }
 
 export interface JudgeOutput {
   failure_probability: number;
   confidence: number;
   rationale: string;
+  disagreement_flag?: boolean;
 }
 
 export interface AssetDetail {
@@ -24,6 +28,13 @@ export interface AssetDetail {
   view4_text: string | null;
   judge_output: JudgeOutput | null;
   created_at: string;
+  rms?: number;
+  kurtosis?: number;
+  risk_level?: string;
+  gate_reason?: string;
+  sample_count?: number;
+  failure_probability?: number;
+  confidence?: number;
 }
 
 export interface CalibrationBin {

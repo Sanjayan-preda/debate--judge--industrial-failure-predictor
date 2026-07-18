@@ -59,3 +59,19 @@ body {
     animation: none !important;
   }
 }
+
+/* ── Entrance animations ─────────────────────────────────────────────── */
+
+.animate-fade-in {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in { opacity: 1; transform: none; animation: none; }
+}

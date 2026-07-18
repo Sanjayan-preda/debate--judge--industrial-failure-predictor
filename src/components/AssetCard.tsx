@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ChevronRight, Cpu } from 'lucide-react';
+import { ChevronRight, Cpu, AlertTriangle } from 'lucide-react';
 import type { AssetSummary } from '../types';
 import StatusDot from './StatusDot';
 import RiskGauge from './RiskGauge';
@@ -10,7 +10,6 @@ interface AssetCardProps {
 
 export default function AssetCard({ asset }: AssetCardProps) {
   const prob = asset.failure_probability;
-  const probPct = Math.round(prob * 100);
 
   return (
     <Link
@@ -31,16 +30,38 @@ export default function AssetCard({ asset }: AssetCardProps) {
         <RiskGauge probability={prob} confidence={asset.confidence} size={120} />
       </div>
 
+      {/* Sensor metrics */}
+      {asset.rms !== undefined && (
+        <div className="flex justify-center gap-4 mt-2 mb-1">
+          <div className="text-center">
+            <p className="text-[10px] text-text-muted font-mono uppercase tracking-wider">RMS</p>
+            <p className="text-xs font-mono text-text-primary font-medium">{asset.rms.toFixed(2)}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-[10px] text-text-muted font-mono uppercase tracking-wider">Kurtosis</p>
+            <p className="text-xs font-mono text-text-primary font-medium">{asset.kurtosis?.toFixed(2)}</p>
+          </div>
+        </div>
+      )}
+
       {/* Footer */}
       <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-        <span className="text-[11px] text-text-muted font-mono">
-          {new Date(asset.timestamp).toLocaleDateString(undefined, {
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-          })}
-        </span>
+        <div className="flex items-center gap-2">
+          {asset.disagreement_flag && (
+            <span className="flex items-center gap-1 text-[10px] text-amber font-mono" title="The assessment team flagged a discrepancy in the data">
+              <AlertTriangle className="w-3 h-3" aria-hidden="true" />
+              Flagged
+            </span>
+          )}
+          <span className="text-[11px] text-text-muted font-mono">
+            {new Date(asset.timestamp).toLocaleDateString(undefined, {
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </span>
+        </div>
         <span className="flex items-center gap-1 text-[11px] font-medium text-teal group-hover:text-teal-dim transition-colors">
           Details <ChevronRight className="w-3 h-3" aria-hidden="true" />
         </span>

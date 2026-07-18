@@ -13,9 +13,7 @@ export default function RiskGauge({ probability, confidence, size = 160 }: RiskG
   useEffect(() => {
     const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
     prefRef.current = mql.matches;
-    // On mount, start needle at 0 then sweep to target
     if (!mql.matches) {
-      // Start at 0 and sweep to target after a tick
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setAnimAngle(-90 + probability * 180);
@@ -54,6 +52,12 @@ export default function RiskGauge({ probability, confidence, size = 160 }: RiskG
   const tipX = cx + needleLen * Math.cos(needleRad);
   const tipY = cy + needleLen * Math.sin(needleRad);
 
+  const confidenceLabel = confidence >= 0.8
+    ? 'high confidence'
+    : confidence >= 0.5
+      ? 'moderate confidence'
+      : 'low confidence';
+
   return (
     <svg
       width={size}
@@ -61,7 +65,7 @@ export default function RiskGauge({ probability, confidence, size = 160 }: RiskG
       viewBox={`0 0 ${size} ${size}`}
       className="shrink-0"
       role="img"
-      aria-label={`Risk gauge: ${Math.round(probability * 100)}% failure probability`}
+      aria-label={`Risk gauge: ${Math.round(probability * 100)}% disruption likelihood`}
     >
       {/* Background arc */}
       <path
@@ -126,7 +130,7 @@ export default function RiskGauge({ probability, confidence, size = 160 }: RiskG
         {Math.round(probability * 100)}%
       </text>
       <text x={cx} y={cy + r * 0.5 + 16} textAnchor="middle" className="fill-text-muted text-[10px]">
-        confidence: {Math.round(confidence * 100)}%
+        {confidenceLabel}
       </text>
     </svg>
   );

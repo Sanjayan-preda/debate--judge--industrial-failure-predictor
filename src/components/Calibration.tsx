@@ -21,9 +21,9 @@ export default function Calibration() {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-3">
         <BarChart3 className="w-10 h-10 text-text-muted" aria-hidden="true" />
-        <p className="text-text-muted text-sm">No calibration data yet</p>
+        <p className="text-text-muted text-sm">No accuracy data yet</p>
         <p className="text-text-muted/60 text-xs">
-          Run at least a few predictions to see calibration metrics.
+          Run at least a few assessments to see accuracy metrics.
         </p>
       </div>
     );
@@ -35,7 +35,7 @@ export default function Calibration() {
   return (
     <div className="max-w-4xl space-y-6 animate-fade-in">
       <h1 className="font-heading text-xl font-semibold text-text-primary tracking-tight">
-        Calibration
+        Accuracy &amp; Trust
       </h1>
 
       {/* Brier score card */}
@@ -45,7 +45,7 @@ export default function Calibration() {
             <Target className="w-5 h-5 text-teal" aria-hidden="true" />
           </div>
           <div>
-            <p className="text-[11px] text-text-muted font-medium uppercase tracking-wider">Brier Score</p>
+            <p className="text-[11px] text-text-muted font-medium uppercase tracking-wider">Accuracy Score</p>
             <p className="font-heading text-2xl font-bold text-text-primary tabular-nums">
               {data.brier_score.toFixed(4)}
             </p>
@@ -56,7 +56,7 @@ export default function Calibration() {
             <BarChart3 className="w-5 h-5 text-amber" aria-hidden="true" />
           </div>
           <div>
-            <p className="text-[11px] text-text-muted font-medium uppercase tracking-wider">Predictions</p>
+            <p className="text-[11px] text-text-muted font-medium uppercase tracking-wider">Assessments</p>
             <p className="font-heading text-2xl font-bold text-text-primary tabular-nums">
               {data.total_predictions}
             </p>
@@ -67,7 +67,7 @@ export default function Calibration() {
             <span className="text-teal font-bold text-lg font-mono">✓</span>
           </div>
           <div>
-            <p className="text-[11px] text-text-muted font-medium uppercase tracking-wider">Interpretation</p>
+            <p className="text-[11px] text-text-muted font-medium uppercase tracking-wider">Performance Rating</p>
             <p className="text-sm text-text-primary">
               {data.brier_score < 0.1 ? 'Excellent' : data.brier_score < 0.2 ? 'Good' : 'Needs improvement'}
             </p>
@@ -87,7 +87,7 @@ export default function Calibration() {
                 tick={{ fill: '#8B8B9E', fontSize: 11 }}
                 axisLine={{ stroke: 'rgba(255,255,255,0.08)' }}
                 tickLine={false}
-                label={{ value: 'Predicted probability bin', position: 'bottom', fill: '#8B8B9E', fontSize: 11, offset: -4 }}
+                label={{ value: 'Predicted risk range', position: 'bottom', fill: '#8B8B9E', fontSize: 11, offset: -4 }}
               />
               <YAxis
                 domain={[0, 1]}
@@ -95,7 +95,7 @@ export default function Calibration() {
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={(v: number) => `${(v * 100).toFixed(0)}%`}
-                label={{ value: 'Actual failure rate', angle: -90, position: 'insideLeft', fill: '#8B8B9E', fontSize: 11, style: { textAnchor: 'middle' } }}
+                label={{ value: 'Actual disruption rate', angle: -90, position: 'insideLeft', fill: '#8B8B9E', fontSize: 11, style: { textAnchor: 'middle' } }}
               />
               <Tooltip
                 contentStyle={{
@@ -121,7 +121,7 @@ export default function Calibration() {
       {/* Scatter: predicted vs actual */}
       {points.length > 0 && (
         <div className="bg-surface border border-border rounded-xl p-4">
-          <h2 className="font-heading text-sm font-semibold text-text-primary mb-4">Predicted Probability vs Outcome</h2>
+          <h2 className="font-heading text-sm font-semibold text-text-primary mb-4">Predicted Risk vs Actual Outcome</h2>
           <ResponsiveContainer width="100%" height={280}>
             <ScatterChart margin={{ top: 8, right: 16, bottom: 8, left: 8 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
@@ -132,7 +132,7 @@ export default function Calibration() {
                 axisLine={{ stroke: 'rgba(255,255,255,0.08)' }}
                 tickLine={false}
                 tickFormatter={(v: number) => `${(v * 100).toFixed(0)}%`}
-                label={{ value: 'Predicted probability', position: 'bottom', fill: '#8B8B9E', fontSize: 11, offset: -4 }}
+                label={{ value: 'Predicted risk', position: 'bottom', fill: '#8B8B9E', fontSize: 11, offset: -4 }}
               />
               <YAxis
                 dataKey="actual_outcome"
@@ -140,7 +140,7 @@ export default function Calibration() {
                 tick={{ fill: '#8B8B9E', fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
-                tickFormatter={(v: number) => v === 0 ? 'No failure' : 'Failure'}
+                tickFormatter={(v: number) => v === 0 ? 'No disruption' : 'Disruption'}
                 label={{ value: 'Actual outcome', angle: -90, position: 'insideLeft', fill: '#8B8B9E', fontSize: 11, style: { textAnchor: 'middle' } }}
               />
               <Tooltip

@@ -11,9 +11,9 @@ export default function AssetList() {
         <div className="w-12 h-12 rounded-xl bg-surface border border-border flex items-center justify-center">
           <span className="text-2xl text-text-muted">∅</span>
         </div>
-        <p className="text-text-muted text-sm">No predictions yet</p>
+        <p className="text-text-muted text-sm">No assessments yet</p>
         <p className="text-text-muted/60 text-xs">
-          Run the predictor to generate predictions — they'll appear here.
+          Run the predictor to generate assessments — they'll appear here.
         </p>
       </div>
     );
