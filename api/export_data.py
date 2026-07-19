@@ -177,8 +177,27 @@ def process_raw_file(file_number: int) -> dict | None:
     else:
         failure_prob = 0.05
         confidence = 0.90
+    # ── Derive ground-truth time_to_failure_label from sensor data ────────
+    # Thresholds based on typical vibration analysis:
+    #   RMS >= 0.75  → developing failure (24h to failure)
+    #   RMS >= 0.73  → marginal (48h to failure)
+    #   RMS >= 0.72  → slightly elevated (72h to failure)
+    #   Otherwise    → no failure observed (0)
+    time_to_failure_label = 0
+    if rms_composite >= 0.75:
+        time_to_failure_label = 24
+    elif rms_composite >= 0.73:
+        time_to_failure_label = 48
+    elif rms_composite >= 0.72:
+        time_to_failure_label = 72
+
+    # Binary outcome for calibration: 1 = failure occurred, 0 = no failure
+    actual_outcome = 1 if time_to_failure_label > 0 else 0
+    actual_outcome_timestamp = ts.strftime("%Y-%m-%dT%H:%M:%SZ")
+
     print(f"  {filename} → {asset_id}: {n} samples, RMS={rms_composite:.3f}, "
-          f"Kurt={kurt_composite:.2f}, Risk={risk_level}")
+          f"Kurt={kurt_composite:.2f}, Risk={risk_level}, "
+          f"Label={time_to_failure_label}h → actual={actual_outcome}")
     return {
         "asset_id": asset_id,
         "timestamp": ts.strftime("%Y-%m-%d %H:%M:%S"),
@@ -194,6 +213,9 @@ def process_raw_file(file_number: int) -> dict | None:
         "gate_reason": gate_reason,
         "failure_probability": round(failure_prob, 4),
         "confidence": round(confidence, 4),
+        "time_to_failure_label": time_to_failure_label,
+        "actual_outcome": actual_outcome,
+        "actual_outcome_timestamp": actual_outcome_timestamp,
     }
 
 
@@ -297,9 +319,10 @@ CREATE TABLE IF NOT EXISTS predictions (
     view3_text        TEXT,
     view4_text        TEXT,
     judge_output_json TEXT,
-    actual_outcome    INTEGER,
-    sample_count      INTEGER,
-    created_at        TEXT NOT NULL
+    actual_outcome          INTEGER,
+    actual_outcome_timestamp TEXT,
+    sample_count            INTEGER,
+    created_at              TEXT NOT NULL
 );
 """
 
@@ -324,15 +347,18 @@ def save_prediction(conn: sqlite3.Connection, data: dict) -> int:
            (asset_id, timestamp, rms, kurtosis, risk_level, gate_reason,
             failure_probability, confidence, view1_text, view2_text,
             view3_text, view4_text, judge_output_json,
+            actual_outcome, actual_outcome_timestamp,
             sample_count, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (
             data["asset_id"], data["timestamp"], data["rms"], data["kurtosis"],
             data["risk_level"], data["gate_reason"],
             data["failure_probability"], data["confidence"],
             data.get("view1_text"), data.get("view2_text"),
             data.get("view3_text"), data.get("view4_text"),
-            json.dumps(judge_output), data["sample_count"], created_at,
+            json.dumps(judge_output),
+            data.get("actual_outcome"), data.get("actual_outcome_timestamp"),
+            data["sample_count"], created_at,
         ),
     )
     conn.commit()
@@ -411,8 +437,9 @@ def export_json_files(conn: sqlite3.Connection) -> None:
 
     # ── Calibration data ─────────────────────────────────────────────────
     cal_rows = conn.execute(
-        "SELECT failure_probability, actual_outcome FROM predictions "
-        "WHERE actual_outcome IS NOT NULL"
+        "SELECT failure_probability, actual_outcome, "
+        "view1_text, view2_text, view3_text, view4_text "
+        "FROM predictions WHERE actual_outcome IS NOT NULL"
     ).fetchall()
     points = []
     brier_total = 0.0
@@ -449,11 +476,62 @@ def export_json_files(conn: sqlite3.Connection) -> None:
             "actual_rate": round(avg_actual, 4),
             "count": count,
         })
+    # ── Agent trust weighting ────────────────────────────────────────────
+    AGENTS = [
+        ("view1_text", "Signal Analyst"),
+        ("view2_text", "Domain Expert"),
+        ("view3_text", "Risk Assessor"),
+        ("view4_text", "Skeptic"),
+    ]
+
+    def parse_lean(view_text: str | None) -> bool | None:
+        """Parse a view's conclusion: True = FOR failure, False = AGAINST, None = unknown."""
+        if not view_text:
+            return None
+        text = view_text.strip().upper()
+        # The Skeptic always concludes "ARGUMENT AGAINST FAILURE"
+        if "ARGUMENT AGAINST FAILURE" in text:
+            return False
+        if "ARGUMENT FOR FAILURE" in text:
+            return True
+        # Fallback heuristics
+        if any(phrase in text for phrase in ["HIGH RISK", "IMMINENT FAILURE", "SIGN OF FAILURE"]):
+            return True
+        if any(phrase in text for phrase in ["NO SIGN OF FAILURE", "WITHIN NORMAL", "LOW RISK"]):
+            return False
+        return None
+
+    agent_trust: list[dict] = []
+    for col, label in AGENTS:
+        matches = 0
+        total = 0
+        for row in cal_rows:
+            r = dict(row)
+            actual = r.get("actual_outcome")
+            if actual is None:
+                continue
+            lean = parse_lean(r.get(col))
+            if lean is None:
+                continue
+            total += 1
+            # "FOR failure" (True) should match actual_outcome=1; "AGAINST" (False) should match actual_outcome=0
+            if (lean and actual == 1) or (not lean and actual == 0):
+                matches += 1
+        accuracy = round(matches / total, 4) if total > 0 else 0.0
+        agent_trust.append({
+            "agent_name": col.replace("_text", ""),
+            "label": label,
+            "accuracy": accuracy,
+            "match_count": matches,
+            "total_count": total,
+        })
+
     calibration = {
         "brier_score": brier_score,
         "total_predictions": n,
         "calibration_curve": bins,
         "points": points,
+        "agent_trust": agent_trust,
     }
     with open(os.path.join(OUTPUT_DIR, "calibration.json"), "w", encoding="utf-8") as f:
         json.dump(calibration, f, indent=2)

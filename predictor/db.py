@@ -44,6 +44,8 @@ def save_prediction(
     view3_text: Optional[str],
     view4_text: Optional[str],
     judge_output: dict,
+    actual_outcome: Optional[int] = None,
+    actual_outcome_timestamp: Optional[str] = None,
 ) -> int:
     """
     Insert one prediction row into the table.
@@ -56,8 +58,8 @@ def save_prediction(
         """
         INSERT INTO predictions
             (asset_id, timestamp, view1_text, view2_text, view3_text, view4_text,
-             judge_output_json, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+             judge_output_json, actual_outcome, actual_outcome_timestamp, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             asset_id,
@@ -67,6 +69,8 @@ def save_prediction(
             view3_text,
             view4_text,
             judge_json,
+            actual_outcome,
+            actual_outcome_timestamp,
             created_at,
         ),
     )

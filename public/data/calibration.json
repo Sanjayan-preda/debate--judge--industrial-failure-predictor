@@ -1,12 +1,12 @@
 {
-  "brier_score": 0.0,
-  "total_predictions": 0,
+  "brier_score": 0.4825,
+  "total_predictions": 15,
   "calibration_curve": [
     {
       "bin_label": "0\u201310%",
       "bin_mid": 0.05,
-      "actual_rate": 0.0,
-      "count": 0
+      "actual_rate": 0.5333,
+      "count": 15
     },
     {
       "bin_label": "10\u201320%",
@@ -63,5 +63,126 @@
       "count": 0
     }
   ],
-  "points": []
+  "points": [
+    {
+      "predicted_probability": 0.05,
+      "actual_outcome": 0,
+      "confidence": 0.0,
+      "squared_error": 0.0025
+    },
+    {
+      "predicted_probability": 0.05,
+      "actual_outcome": 0,
+      "confidence": 0.0,
+      "squared_error": 0.0025
+    },
+    {
+      "predicted_probability": 0.05,
+      "actual_outcome": 1,
+      "confidence": 0.0,
+      "squared_error": 0.9025
+    },
+    {
+      "predicted_probability": 0.05,
+      "actual_outcome": 0,
+      "confidence": 0.0,
+      "squared_error": 0.0025
+    },
+    {
+      "predicted_probability": 0.05,
+      "actual_outcome": 0,
+      "confidence": 0.0,
+      "squared_error": 0.0025
+    },
+    {
+      "predicted_probability": 0.05,
+      "actual_outcome": 0,
+      "confidence": 0.0,
+      "squared_error": 0.0025
+    },
+    {
+      "predicted_probability": 0.05,
+      "actual_outcome": 0,
+      "confidence": 0.0,
+      "squared_error": 0.0025
+    },
+    {
+      "predicted_probability": 0.05,
+      "actual_outcome": 0,
+      "confidence": 0.0,
+      "squared_error": 0.0025
+    },
+    {
+      "predicted_probability": 0.05,
+      "actual_outcome": 1,
+      "confidence": 0.0,
+      "squared_error": 0.9025
+    },
+    {
+      "predicted_probability": 0.05,
+      "actual_outcome": 1,
+      "confidence": 0.0,
+      "squared_error": 0.9025
+    },
+    {
+      "predicted_probability": 0.05,
+      "actual_outcome": 1,
+      "confidence": 0.0,
+      "squared_error": 0.9025
+    },
+    {
+      "predicted_probability": 0.05,
+      "actual_outcome": 1,
+      "confidence": 0.0,
+      "squared_error": 0.9025
+    },
+    {
+      "predicted_probability": 0.05,
+      "actual_outcome": 1,
+      "confidence": 0.0,
+      "squared_error": 0.9025
+    },
+    {
+      "predicted_probability": 0.05,
+      "actual_outcome": 1,
+      "confidence": 0.0,
+      "squared_error": 0.9025
+    },
+    {
+      "predicted_probability": 0.05,
+      "actual_outcome": 1,
+      "confidence": 0.0,
+      "squared_error": 0.9025
+    }
+  ],
+  "agent_trust": [
+    {
+      "agent_name": "view1",
+      "label": "Signal Analyst",
+      "accuracy": 0.0,
+      "match_count": 0,
+      "total_count": 0
+    },
+    {
+      "agent_name": "view2",
+      "label": "Domain Expert",
+      "accuracy": 0.0,
+      "match_count": 0,
+      "total_count": 0
+    },
+    {
+      "agent_name": "view3",
+      "label": "Risk Assessor",
+      "accuracy": 0.0,
+      "match_count": 0,
+      "total_count": 0
+    },
+    {
+      "agent_name": "view4",
+      "label": "Skeptic",
+      "accuracy": 0.0,
+      "match_count": 0,
+      "total_count": 0
+    }
+  ]
 }

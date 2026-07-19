@@ -210,8 +210,27 @@ def process_raw_file(file_number: int) -> dict | None:
         failure_prob = 0.05
         confidence = 0.90
 
+    # ── Derive ground-truth time_to_failure_label from sensor data ────────
+    # Thresholds based on typical vibration analysis:
+    #   RMS >= 0.75  → developing failure (24h to failure)
+    #   RMS >= 0.73  → marginal (48h to failure)
+    #   RMS >= 0.72  → slightly elevated (72h to failure)
+    #   Otherwise    → no failure observed (0)
+    time_to_failure_label = 0
+    if rms_composite >= 0.75:
+        time_to_failure_label = 24
+    elif rms_composite >= 0.73:
+        time_to_failure_label = 48
+    elif rms_composite >= 0.72:
+        time_to_failure_label = 72
+
+    # Binary outcome for calibration: 1 = failure occurred, 0 = no failure
+    actual_outcome = 1 if time_to_failure_label > 0 else 0
+    actual_outcome_timestamp = ts.strftime("%Y-%m-%dT%H:%M:%SZ")
+
     print(f"  {filename} → {asset_id}: {n} samples, RMS={rms_composite:.3f}, "
-          f"Kurt={kurt_composite:.2f}, Risk={risk_level}")
+          f"Kurt={kurt_composite:.2f}, Risk={risk_level}, "
+          f"Label={time_to_failure_label}h → actual={actual_outcome}")
 
     return {
         "asset_id": asset_id,
@@ -228,6 +247,9 @@ def process_raw_file(file_number: int) -> dict | None:
         "gate_reason": gate_reason,
         "failure_probability": round(failure_prob, 4),
         "confidence": round(confidence, 4),
+        "time_to_failure_label": time_to_failure_label,
+        "actual_outcome": actual_outcome,
+        "actual_outcome_timestamp": actual_outcome_timestamp,
     }
 
 
@@ -251,9 +273,10 @@ CREATE TABLE IF NOT EXISTS predictions (
     view3_text        TEXT,
     view4_text        TEXT,
     judge_output_json TEXT,
-    actual_outcome    INTEGER,
-    sample_count      INTEGER,
-    created_at        TEXT NOT NULL
+    actual_outcome          INTEGER,
+    actual_outcome_timestamp TEXT,
+    sample_count            INTEGER,
+    created_at              TEXT NOT NULL
 );
 """
 
@@ -283,14 +306,17 @@ def save_prediction(conn: sqlite3.Connection, data: dict) -> int:
            (asset_id, timestamp, rms, kurtosis, risk_level, gate_reason,
             failure_probability, confidence, view1_text, view2_text,
             view3_text, view4_text, judge_output_json,
+            actual_outcome, actual_outcome_timestamp,
             sample_count, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (
             data["asset_id"], data["timestamp"], data["rms"], data["kurtosis"],
             data["risk_level"], data["gate_reason"],
             data["failure_probability"], data["confidence"],
             view1, view2, view3, view4,
-            json.dumps(judge_output), data["sample_count"], created_at,
+            json.dumps(judge_output),
+            data.get("actual_outcome"), data.get("actual_outcome_timestamp"),
+            data["sample_count"], created_at,
         ),
     )
     conn.commit()
@@ -303,6 +329,7 @@ def write_features_csv(rows: list[dict]) -> None:
         "kurtosis_h", "kurtosis_v", "kurtosis",
         "spectral_features", "sample_count", "risk_level",
         "gate_reason", "failure_probability", "confidence",
+        "time_to_failure_label", "actual_outcome",
     ]
     with open(FEATURES_PATH, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)

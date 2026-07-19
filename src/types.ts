@@ -51,9 +51,18 @@ export interface CalibrationPoint {
   squared_error: number;
 }
 
+export interface AgentTrustData {
+  agent_name: string;
+  label: string;
+  accuracy: number;
+  match_count: number;
+  total_count: number;
+}
+
 export interface CalibrationData {
   brier_score: number;
   total_predictions: number;
   calibration_curve: CalibrationBin[];
   points: CalibrationPoint[];
+  agent_trust: AgentTrustData[];
 }

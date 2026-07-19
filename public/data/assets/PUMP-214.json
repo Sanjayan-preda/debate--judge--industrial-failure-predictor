@@ -1,5 +1,5 @@
 {
-  "id": 74,
+  "id": 14,
   "asset_id": "PUMP-214",
   "timestamp": "2025-01-03 08:00:00",
   "rms": 0.755938,
@@ -12,9 +12,10 @@
   "view2_text": null,
   "view3_text": null,
   "view4_text": null,
-  "actual_outcome": null,
+  "actual_outcome": 1,
+  "actual_outcome_timestamp": "2025-01-03T08:00:00Z",
   "sample_count": 32768,
-  "created_at": "2026-07-19T15:41:02Z",
+  "created_at": "2026-07-19T16:41:15Z",
   "judge_output": {
     "failure_probability": 0.05,
     "confidence": 0.9,

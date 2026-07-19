@@ -76,16 +76,19 @@ def load_features(path: str) -> list[dict]:
     Read the features CSV and return a list of row-dicts.
     Strips the 'time_to_failure_label' column before returning so that
     the label is NEVER sent to any AI view (prevents label leakage).
+    Returns the labels separately for later DB storage.
     """
     rows = []
+    labels = []
     try:
         with open(path, newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             for i, row in enumerate(reader, start=1):
                 # Strip whitespace from keys/values
                 clean = {k.strip(): v.strip() for k, v in row.items()}
-                # Remove the label column — never shown to the AI
-                clean.pop("time_to_failure_label", None)
+                # Extract and remove the label column — never shown to the AI
+                ttf_label = clean.pop("time_to_failure_label", None)
+                labels.append(ttf_label)
                 rows.append(clean)
     except FileNotFoundError:
         print(f"[FATAL] Features file not found: {path}", file=sys.stderr)
@@ -99,7 +102,7 @@ def load_features(path: str) -> list[dict]:
         sys.exit(1)
 
     print(f"[LOAD] Loaded {len(rows)} rows from {path}")
-    return rows
+    return rows, labels
 
 
 def run_debate(row: dict, cfg: Config) -> tuple[str, str, str, str]:
@@ -129,6 +132,7 @@ def process_one_row(
     total: int,
     cfg: Config,
     conn,
+    time_to_failure_label: str | None = None,
 ) -> dict:
     """
     Process a single feature row through the full pipeline:
@@ -143,6 +147,17 @@ def process_one_row(
     print(f"\n{'='*60}")
     print(f"[ROW {idx}/{total}] asset_id={asset_id}  timestamp={timestamp}")
     print(f"{'='*60}")
+
+    # ── Convert ground-truth label to binary actual_outcome ───────────────
+    actual_outcome = None
+    actual_outcome_timestamp = None
+    if time_to_failure_label is not None and time_to_failure_label.strip():
+        try:
+            ttf = int(time_to_failure_label)
+            actual_outcome = 1 if ttf > 0 else 0
+            actual_outcome_timestamp = timestamp
+        except (ValueError, TypeError):
+            pass
 
     # ── Step 0: Anomaly Gate ─────────────────────────────────────────
     escalate, gate_reason = anomaly_gate(row)
@@ -165,11 +180,14 @@ def process_one_row(
             view3_text=None,
             view4_text=None,
             judge_output=judge_output,
+            actual_outcome=actual_outcome,
+            actual_outcome_timestamp=actual_outcome_timestamp,
         )
         print(f"\n── Result ──")
         print(f"  DB row ID:    {row_id}")
         print(f"  Probability:  0.05 (gate bypass)")
         print(f"  Confidence:   0.95")
+        print(f"  Actual:       {actual_outcome}")
         return {
             "asset_id": asset_id,
             "timestamp": timestamp,
@@ -200,6 +218,8 @@ def process_one_row(
         view3_text=v3_text,
         view4_text=v4_text,
         judge_output=judge_output,
+        actual_outcome=actual_outcome,
+        actual_outcome_timestamp=actual_outcome_timestamp,
     )
 
     # ── Summary for this row ──────────────────────────────────────────
@@ -233,9 +253,10 @@ def process_all(
     Load features, run the full pipeline for every row, and return summaries.
     If limit > 0, only process that many rows (useful for dry-run/testing).
     """
-    rows = load_features(csv_path)
+    rows, labels = load_features(csv_path)
     if limit > 0:
         rows = rows[:limit]
+        labels = labels[:limit] if labels else []
         print(f"[LIMIT] Processing first {limit} row(s) only")
 
     conn = init_db(db_path)
@@ -243,7 +264,8 @@ def process_all(
 
     start_time = time.time()
     for idx, row in enumerate(rows, start=1):
-        summary = process_one_row(row, idx, len(rows), cfg, conn)
+        label = labels[idx - 1] if idx - 1 < len(labels) else None
+        summary = process_one_row(row, idx, len(rows), cfg, conn, time_to_failure_label=label)
         summaries.append(summary)
 
     elapsed = time.time() - start_time
