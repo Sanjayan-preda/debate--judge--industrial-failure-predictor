@@ -1,0 +1,24 @@
+{
+  "id": 70,
+  "asset_id": "PUMP-210",
+  "timestamp": "2025-01-03 00:00:00",
+  "rms": 0.740296,
+  "kurtosis": 3.0461,
+  "risk_level": "low",
+  "gate_reason": "All readings within normal operating range",
+  "failure_probability": 0.05,
+  "confidence": 0.9,
+  "view1_text": null,
+  "view2_text": null,
+  "view3_text": null,
+  "view4_text": null,
+  "actual_outcome": null,
+  "sample_count": 32768,
+  "created_at": "2026-07-19T15:41:00Z",
+  "judge_output": {
+    "failure_probability": 0.05,
+    "confidence": 0.9,
+    "rationale": "All readings within normal operating range",
+    "disagreement_flag": false
+  }
+}

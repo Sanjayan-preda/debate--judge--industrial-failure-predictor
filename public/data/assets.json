@@ -1,0 +1,167 @@
+[
+  {
+    "asset_id": "PUMP-201",
+    "timestamp": "2025-01-01 12:00:00",
+    "failure_probability": 0.05,
+    "confidence": 0.9,
+    "risk_level": "low",
+    "prediction_id": 61,
+    "rms": 0.7181,
+    "kurtosis": 3.1638,
+    "disagreement_flag": false
+  },
+  {
+    "asset_id": "PUMP-202",
+    "timestamp": "2025-01-01 14:00:00",
+    "failure_probability": 0.05,
+    "confidence": 0.9,
+    "risk_level": "low",
+    "prediction_id": 62,
+    "rms": 0.7095,
+    "kurtosis": 3.0696,
+    "disagreement_flag": false
+  },
+  {
+    "asset_id": "PUMP-203",
+    "timestamp": "2025-01-01 16:00:00",
+    "failure_probability": 0.05,
+    "confidence": 0.9,
+    "risk_level": "low",
+    "prediction_id": 63,
+    "rms": 0.7279,
+    "kurtosis": 3.126,
+    "disagreement_flag": false
+  },
+  {
+    "asset_id": "PUMP-204",
+    "timestamp": "2025-01-01 18:00:00",
+    "failure_probability": 0.05,
+    "confidence": 0.9,
+    "risk_level": "low",
+    "prediction_id": 64,
+    "rms": 0.7135,
+    "kurtosis": 3.1074,
+    "disagreement_flag": false
+  },
+  {
+    "asset_id": "PUMP-205",
+    "timestamp": "2025-01-01 20:00:00",
+    "failure_probability": 0.05,
+    "confidence": 0.9,
+    "risk_level": "low",
+    "prediction_id": 65,
+    "rms": 0.7038,
+    "kurtosis": 3.0358,
+    "disagreement_flag": false
+  },
+  {
+    "asset_id": "PUMP-206",
+    "timestamp": "2025-01-01 22:00:00",
+    "failure_probability": 0.05,
+    "confidence": 0.9,
+    "risk_level": "low",
+    "prediction_id": 66,
+    "rms": 0.6945,
+    "kurtosis": 3.097,
+    "disagreement_flag": false
+  },
+  {
+    "asset_id": "PUMP-207",
+    "timestamp": "2025-01-02 00:00:00",
+    "failure_probability": 0.05,
+    "confidence": 0.9,
+    "risk_level": "low",
+    "prediction_id": 67,
+    "rms": 0.7102,
+    "kurtosis": 3.1068,
+    "disagreement_flag": false
+  },
+  {
+    "asset_id": "PUMP-208",
+    "timestamp": "2025-01-02 02:00:00",
+    "failure_probability": 0.05,
+    "confidence": 0.9,
+    "risk_level": "low",
+    "prediction_id": 68,
+    "rms": 0.7096,
+    "kurtosis": 3.0735,
+    "disagreement_flag": false
+  },
+  {
+    "asset_id": "PUMP-209",
+    "timestamp": "2025-01-02 22:00:00",
+    "failure_probability": 0.05,
+    "confidence": 0.9,
+    "risk_level": "low",
+    "prediction_id": 69,
+    "rms": 0.7465,
+    "kurtosis": 3.0545,
+    "disagreement_flag": false
+  },
+  {
+    "asset_id": "PUMP-210",
+    "timestamp": "2025-01-03 00:00:00",
+    "failure_probability": 0.05,
+    "confidence": 0.9,
+    "risk_level": "low",
+    "prediction_id": 70,
+    "rms": 0.7403,
+    "kurtosis": 3.0461,
+    "disagreement_flag": false
+  },
+  {
+    "asset_id": "PUMP-211",
+    "timestamp": "2025-01-03 02:00:00",
+    "failure_probability": 0.05,
+    "confidence": 0.9,
+    "risk_level": "low",
+    "prediction_id": 71,
+    "rms": 0.7451,
+    "kurtosis": 3.0665,
+    "disagreement_flag": false
+  },
+  {
+    "asset_id": "PUMP-212",
+    "timestamp": "2025-01-03 04:00:00",
+    "failure_probability": 0.05,
+    "confidence": 0.9,
+    "risk_level": "low",
+    "prediction_id": 72,
+    "rms": 0.7524,
+    "kurtosis": 3.1474,
+    "disagreement_flag": false
+  },
+  {
+    "asset_id": "PUMP-213",
+    "timestamp": "2025-01-03 06:00:00",
+    "failure_probability": 0.05,
+    "confidence": 0.9,
+    "risk_level": "low",
+    "prediction_id": 73,
+    "rms": 0.758,
+    "kurtosis": 3.0398,
+    "disagreement_flag": false
+  },
+  {
+    "asset_id": "PUMP-214",
+    "timestamp": "2025-01-03 08:00:00",
+    "failure_probability": 0.05,
+    "confidence": 0.9,
+    "risk_level": "low",
+    "prediction_id": 74,
+    "rms": 0.7559,
+    "kurtosis": 2.9919,
+    "disagreement_flag": false
+  },
+  {
+    "asset_id": "PUMP-215",
+    "timestamp": "2025-01-03 10:00:00",
+    "failure_probability": 0.05,
+    "confidence": 0.9,
+    "risk_level": "low",
+    "prediction_id": 75,
+    "rms": 0.7623,
+    "kurtosis": 3.027,
+    "disagreement_flag": false
+  }
+]

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "python api/server.py & vite",
-    "build": "vite build",
+    "build": "python api/export_data.py && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
